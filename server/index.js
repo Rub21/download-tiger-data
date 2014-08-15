@@ -1,7 +1,7 @@
 var express = require('express');
 var cors = require('cors');
 var pg = require('pg');
-//var osm2geojson = require('./osm2geojson');
+var osm_geojson = require('../osm2geojson.js');
 
 var conString = "postgres://postgres:1234@54.234.212.165/dbtiger";
 var client = new pg.Client(conString);
@@ -103,7 +103,6 @@ app.get('/ways_xml/:bbox', function(req, res) {
 						res.statusCode = 404;
 						return res.send('Error 404: No quote found');
 					} else {
-
 						try {
 							for (var i = 0; i < result.rows.length; i++) {
 								var way = {
@@ -113,7 +112,6 @@ app.get('/ways_xml/:bbox', function(req, res) {
 									},
 									"geometry": {}
 								}
-
 								if (result.rows[i].fullname !== null) {
 									way.properties['name'] = rename_road(result.rows[i].fullname);
 
@@ -122,24 +120,22 @@ app.get('/ways_xml/:bbox', function(req, res) {
 								json.features.push(way);
 
 							};
-
-							var osm = '';//osm2geojson.geojson2osm(json);
-
+							//console.log(json);
+							var osm = osm_geojson.geojson2osm(json);
+							//console.log(osm);
 							res.set('Content-Type', 'text/xml');
 							res.send(osm);
 
 
 
 						} catch (e) {
-							console.log("entering catch block");
-
+							console.log("entering catch block2");
 						}
 					}
 				});
-
 			} catch (e) {
 				console.log(e);
-				console.log("entering catch block");
+				console.log("entering catch block1");
 
 			}
 		}
