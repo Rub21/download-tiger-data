@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Download tiger Data</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.css' rel='stylesheet' />
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+
+
+    <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.js'></script>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
+    <script src="jquery-1.9.0.js"></script>
+    <script src='./osm2geojson.js'></script>
+    <script src='points.js'></script>
+    <script src='lines.geojson'></script>
+    <script src="polygonos.geojson"></script>
+    <div id='map'></div>
+
+    <script>
+    L.mapbox.accessToken = 'pk.eyJ1IjoicnViZW4iLCJhIjoiUVFINFozRSJ9.lIZKS5xpyV57U6-_Rjr6Og';
+    var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617')
+        .setView([38.89399, -77.03659], 4);
+
+    var hash = L.hash(map);
+    var featureGroup = L.featureGroup().addTo(map);
+
+
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polyline: false,
+            polygon: false,
+            marker: false,
+            circle: false,
+            rectangle: {
+                shapeOptions: {
+                    color: '#8FD01A'
+                }
+            }
+        },
+        edit: {
+            featureGroup: featureGroup
+        }
+
+
+    }).addTo(map);
+
+    map.on('draw:created', function(e) {
+        featureGroup.addLayer(e.layer);
+        var layer = e.layer;
+        var type = e.layerType;
+
+      
+        layer.on('contextmenu', function(evt) {  process_osm(get_valor(type, layer));});
+
+    });
+
+
+    function get_valor(type, layer) {
+        var cordenadas;
+        var valor;
+        if (type === 'rectangle') {
+            cordenadas = layer.toGeoJSON().geometry.coordinates[0];
+            var rectangle = cordenadas[0][0] + ' ' + cordenadas[0][1] + ',' + cordenadas[2][0] + ' ' + cordenadas[2][1];
+            valor = rectangle.toString();
+            return valor;
+        }
+    }
+
+    function process_osm(coordinates) {
+        var url = 'http://localhost:3021/ways_xml/' + coordinates;
+        var p1 = coordinates.split(",")[0].split(" ");
+        var p2 = coordinates.split(",")[1].split(" ");
+        $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
+        $.ajax('http://localhost:8111/import?title=tiger2013&new_layer=true&url='+url);
+
+        console.log(url);
+        $.ajax({
+            dataType: "json",
+            url: url,
+            success: function(json) {
+                console.log(json);
+                //way_osm = osm_geojson.geojson2osm(json);
+                //console.log(way_osm);
+                //download_osm_file('osm.osm', way_osm);
+                //download in JOSM
+                
+
+                
+            }
+        });
+    }
+
+    function download_osm_file(filename, text) {
+        var pom = document.createElement('a');
+
+        var url = "data:text/plain;charset=utf-8," + encodeURIComponent(text);
+
+
+        var download_url="http://localhost:8111/import?title=tiger2013&new_layer=true&url="+url;
+
+        pom.setAttribute('href', download_url);
+
+      console.log(download_url);
+        pom.setAttribute('download', filename);
+        pom.click();
+
+
+        
+    }
+    </script>
+
+
+</body>
+
+</html>
