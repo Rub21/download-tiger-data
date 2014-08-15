@@ -1,7 +1,7 @@
 var express = require('express');
 var cors = require('cors');
 var pg = require('pg');
-var osm2geojson = require('./osm2geojson');
+//var osm2geojson = require('./osm2geojson');
 
 var conString = "postgres://postgres:1234@54.234.212.165/dbtiger";
 var client = new pg.Client(conString);
@@ -123,7 +123,7 @@ app.get('/ways_xml/:bbox', function(req, res) {
 
 							};
 
-							var osm = osm2geojson.geojson2osm(json);
+							var osm = '';//osm2geojson.geojson2osm(json);
 
 							res.set('Content-Type', 'text/xml');
 							res.send(osm);
