@@ -22,16 +22,14 @@
     }).addTo(map);
 
     map.on('draw:created', function(e) {
-        featureGroup.addLayer(e.layer);
         var layer = e.layer;
+        featureGroup.addLayer(layer);
         layer.on('contextmenu', function(evt) {
             context_menu(evt, e);
             // download_josm_xml(get_valor(type, layer)); //working with xml
             // download_file_json(get_valor(type, layer)); //working with json
-
         });
     });
-
 
     function get_valor(type, layer) {
         var cordenadas;
@@ -73,7 +71,6 @@
         });
     }
 
-
     function context_menu(evt, e) {
         $('#context').show();
         $('#context').css('left', evt.originalEvent.clientX);
@@ -84,9 +81,6 @@
         $('#context').mouseleave(function() {
             $('#context').hide();
         });
-        $("#btndownload").click(function(event) {
-            download_josm_xml(get_valor(e.layerType, e.layer));
-            evt.stopPropagation();
-
-        });
+        var coords = get_valor(e.layerType, e.layer);
+        $("#btndownload").attr('onclick', 'download_josm_xml(\'' + coords + '\')');
     }

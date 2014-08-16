@@ -9,10 +9,11 @@
         <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css' rel='stylesheet' />
         <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.js'></script>
         <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
+        <script src="jquery.js"></script>
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        <script src="jquery.js"></script>
+        
         <style>
         body {
         margin: 0;
@@ -28,14 +29,14 @@
         background:#fff;
         position: absolute;
         z-index: 9999;
-display: none;
+        display: none;
         }
         </style>
     </head>
     <body>
         <div id='map'></div>
         <div id="context">
-            <ul id="contextMenu" class="dropdown-menu" role="menu" style="display:block" >
+            <ul class="dropdown-menu" role="menu" style="display:block" >
                 <li><a tabindex="-1" href="#" id="btndownload">Download Data</a></li>
             </ul>
         </div>
