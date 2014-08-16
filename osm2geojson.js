@@ -172,10 +172,8 @@ osm_geojson.geojson2osm = function(geojson) {
     var changeset = 'false';
     var osm_file = '';
 
-    console.log(geojson);
     if (typeof geojson === 'string') geojson = JSON.parse(geojson);
-    console.log(geojson);
-
+    
     switch (geojson.type) {
         case 'FeatureCollection':
             var temp = {
@@ -195,7 +193,7 @@ osm_geojson.geojson2osm = function(geojson) {
                 temp.relations += obj[n].relations;
             }
 
-            temp.osm = '<?xml version="1.0" encoding="UTF-8"?><osm version="0.6" generator="xxx">';
+            temp.osm = '<?xml version="1.0" encoding="UTF-8"?><osm version="0.6" generator="https://github.com/Rub21/download-tiger-data">';
             temp.osm += temp.nodes + temp.ways + temp.relations;
             temp.osm += '</osm>';
             osm_file = temp.osm;

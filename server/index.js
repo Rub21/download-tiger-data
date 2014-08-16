@@ -21,7 +21,6 @@ app.get('/ways_json/:bbox', function(req, res) {
 		"features": []
 	};
 	var query_id = "select get_geoid('" + bbox + "') as geoid;";
-	//console.log(query_id);
 	client.query(query_id, function(error, result) {
 		if (error) {
 			console.log(error);
@@ -33,7 +32,6 @@ app.get('/ways_json/:bbox', function(req, res) {
 				console.log(geoid);
 				bbox = bbox.replace(' ', ',').replace(' ', ',');
 				var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
-					//console.log(query);
 				client.query(query, function(error, result) {
 					if (error) {
 						console.log(error);
@@ -50,9 +48,6 @@ app.get('/ways_json/:bbox', function(req, res) {
 									},
 									"geometry": {}
 								}
-
-								//console.log(result.rows[i].fullname);
-
 								if (result.rows[i].fullname !== null) {
 									way.properties['name'] = rename_road(result.rows[i].fullname);
 
@@ -120,9 +115,8 @@ app.get('/ways_xml/:bbox', function(req, res) {
 								json.features.push(way);
 
 							};
-							//console.log(json);
+			
 							var osm = osm_geojson.geojson2osm(json);
-							//console.log(osm);
 							res.set('Content-Type', 'text/xml');
 							res.send(osm);
 
