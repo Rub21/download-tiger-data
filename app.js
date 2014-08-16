@@ -1,7 +1,7 @@
     L.mapbox.accessToken = 'pk.eyJ1IjoicnViZW4iLCJhIjoiUVFINFozRSJ9.lIZKS5xpyV57U6-_Rjr6Og';
     var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617')
         .setView([38.89399, -77.03659], 4);
-
+    var host = '54.234.212.165';
     var hash = L.hash(map);
     var featureGroup = L.featureGroup().addTo(map);
     var drawControl = new L.Control.Draw({
@@ -26,8 +26,8 @@
         var layer = e.layer;
         var type = e.layerType;
         layer.on('contextmenu', function(evt) {
-            // download_josm_xml(get_valor(type, layer)); //working with xml
-            download_file_json(get_valor(type, layer)); //working with json
+            download_josm_xml(get_valor(type, layer)); //working with xml
+            // download_file_json(get_valor(type, layer)); //working with json
 
         });
     });
@@ -45,27 +45,28 @@
     }
 
     function download_josm_xml(coordinates) {
-        var url = 'http://localhost:3021/ways_xml/' + coordinates;
+        var url = 'http://' + host + ':3021/ways_xml/' + coordinates;
+        console.log(url);
         var p1 = coordinates.split(",")[0].split(" ");
         var p2 = coordinates.split(",")[1].split(" ");
         $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
         $.ajax('http://localhost:8111/import?title=tiger2013&new_layer=true&url=' + url);
     }
 
-    function download_file_json(filename, text) {
-        var url = 'http://localhost:3021/ways_json/' + coordinates;
-        console.log(url);
+    function download_file_json(coordinates) {
+        var url = 'http://' + host + ':3021/ways_json/' + coordinates;
+        //console.log(url);
+        var p1 = coordinates.split(",")[0].split(" ");
+        var p2 = coordinates.split(",")[1].split(" ");
+        $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
         $.ajax({
             dataType: "json",
             url: url,
             success: function(json) {
-                console.log(json);
                 way_osm = osm_geojson.geojson2osm(json);
-                download_osm_file('osm.osm', way_osm);
                 var pom = document.createElement('a');
-                var url = "data:text/plain;charset=utf-8," + encodeURIComponent(text);
-                pom.setAttribute('href', url);
-                console.log(download_url);
+                var url_data = "data:text/plain;charset=utf-8," + encodeURIComponent(way_osm);
+                pom.setAttribute('href', url_data);
                 pom.setAttribute('download', 'osm.osm');
                 pom.click();
             }

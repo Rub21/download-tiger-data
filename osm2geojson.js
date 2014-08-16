@@ -1,6 +1,7 @@
-function geojson2osm(geojson) {
-
+var osm_geojson = {};
+osm_geojson.geojson2osm = function(geojson) {
     function togeojson(geo, properties) {
+        if (typeof geo === 'string') geo = JSON.parse(geo);
         var nodes = '',
             ways = '',
             relations = '';
@@ -11,6 +12,7 @@ function geojson2osm(geojson) {
                 append(Point(geo, properties));
                 break;
             case 'MultiPoint':
+                break;
             case 'LineString':
                 append(LineString(geo, properties)); //if polygon is made with LineString,this working too.
                 break;
@@ -21,6 +23,7 @@ function geojson2osm(geojson) {
                 append(Polygon(geo, properties));
                 break;
             case 'MultiPolygon':
+                break;
         }
 
         function append(obj) {
@@ -28,7 +31,6 @@ function geojson2osm(geojson) {
             ways += obj.ways;
             relations += obj.relations;
         }
-
         return {
             nodes: nodes,
             ways: ways,
@@ -45,11 +47,10 @@ function geojson2osm(geojson) {
         count--;
         return {
             nodes: nodes
-        }
+        };
     }
 
     function LineString(geo, properties) {
-        console.log(geo)
         var nodes = '',
             ways = '';
         var coords = [];
@@ -58,7 +59,6 @@ function geojson2osm(geojson) {
         for (var i = 0; i <= geo.coordinates.length - 1; i++) {
             coords.push([geo.coordinates[i][1], geo.coordinates[i][0]]);
         }
-        console.log(coords)
         coords = createNodes(coords, false);
         nodes += coords.nodes;
         ways += coords.nds;
@@ -68,11 +68,7 @@ function geojson2osm(geojson) {
             nodes: nodes,
             ways: ways
         };
-
-
-
     }
-
 
     function MultiLineString(geo, properties) {
         var nodes = '',
@@ -130,14 +126,12 @@ function geojson2osm(geojson) {
     }
 
     function roundCoords(coords) {
-        console.log(coords);
         for (var a = 0; a < coords.length; a++) {
             coords[a][0] = Math.round(coords[a][0] * 1000000) / 1000000;
             coords[a][1] = Math.round(coords[a][1] * 1000000) / 1000000;
         }
         return coords;
     }
-
 
     function createNodes(coords, repeatLastND) {
         var nds = '',
@@ -154,16 +148,19 @@ function geojson2osm(geojson) {
                 nds += '<nd ref="' + hash[coords[a]] + '"/>';
             } else {
                 hash[coords[a]] = count;
-                if (repeatLastND && a === 0)
+                if (repeatLastND && a === 0) {
                     repeatLastND = count;
+                }
                 nds += '<nd ref="' + count + '"/>';
                 nodes += '<node id="' + count + '" lat="' + coords[a][0] + '" lon="' + coords[a][1] + '" changeset="' + changeset + '"/>';
 
-                if (repeatLastND && a === length - 1)
+                if (repeatLastND && a === length - 1) {
                     nds += '<nd ref="' + repeatLastND + '"/>';
-                count--;
+                }
             }
+            count--;
         }
+
         return {
             'nds': nds,
             'nodes': nodes
@@ -174,6 +171,10 @@ function geojson2osm(geojson) {
     var count = -1;
     var changeset = 'false';
     var osm_file = '';
+
+    console.log(geojson);
+    if (typeof geojson === 'string') geojson = JSON.parse(geojson);
+    console.log(geojson);
 
     switch (geojson.type) {
         case 'FeatureCollection':
@@ -198,10 +199,13 @@ function geojson2osm(geojson) {
             temp.osm += temp.nodes + temp.ways + temp.relations;
             temp.osm += '</osm>';
             osm_file = temp.osm;
+
             break;
 
         default:
             console.log('default');
+            break;
     }
     return osm_file;
 };
+if (typeof module !== 'undefined') module.exports = osm_geojson;
