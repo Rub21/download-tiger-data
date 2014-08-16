@@ -31,6 +31,14 @@
         z-index: 9999;
         display: none;
         }
+        .info {
+        background:#fff;
+        position: absolute;
+        z-index: 9999;
+        width: 250px;
+        top: 5px;
+        right: 5px;
+        }
         </style>
     </head>
     <body>
@@ -39,6 +47,10 @@
             <ul class="dropdown-menu" role="menu" style="display:block" >
                 <li><a tabindex="-1" href="#" id="btndownload">Download Data</a></li>
             </ul>
+        </div>
+        <div class="info  well">
+           <p>Quick and easy way to improve Openstreetmap with Tiger 2013</p>
+            
         </div>
         <script src='osm2geojson.js'></script>
         <script src="app.js"></script>
