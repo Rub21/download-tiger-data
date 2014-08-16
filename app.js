@@ -24,9 +24,9 @@
     map.on('draw:created', function(e) {
         featureGroup.addLayer(e.layer);
         var layer = e.layer;
-        var type = e.layerType;
         layer.on('contextmenu', function(evt) {
-            download_josm_xml(get_valor(type, layer)); //working with xml
+            context_menu(evt, e);
+            // download_josm_xml(get_valor(type, layer)); //working with xml
             // download_file_json(get_valor(type, layer)); //working with json
 
         });
@@ -70,5 +70,23 @@
                 pom.setAttribute('download', 'osm.osm');
                 pom.click();
             }
+        });
+    }
+
+
+    function context_menu(evt, e) {
+        $('#context').show();
+        $('#context').css('left', evt.originalEvent.clientX);
+        $('#context').css('top', evt.originalEvent.clientY);
+        $('#context').hover(function() {
+            $('#context').show();
+        });
+        $('#context').mouseleave(function() {
+            $('#context').hide();
+        });
+        $("#btndownload").click(function(event) {
+            download_josm_xml(get_valor(e.layerType, e.layer));
+            evt.stopPropagation();
+
         });
     }
