@@ -3,7 +3,7 @@ var cors = require('cors');
 var pg = require('pg');
 var osm_geojson = require('../osm2geojson.js');
 
-var conString = "postgres://postgres:1234@localhost/dbtiger";
+var conString = "postgres://postgres:1234@54.234.212.165/dbtiger";
 var client = new pg.Client(conString);
 var app = express();
 app.use(cors());
@@ -29,7 +29,7 @@ app.get('/ways_json/:bbox', function(req, res) {
 		} else {
 			try {
 				var geoid = result.rows[0].geoid;
-				console.log('='+geoid);
+				console.log('=' + geoid);
 				bbox = bbox.replace(' ', ',').replace(' ', ',');
 				var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
 				client.query(query, function(error, result) {
@@ -116,7 +116,7 @@ app.get('/ways_xml/:bbox', function(req, res) {
 								json.features.push(way);
 
 							};
-			
+
 							var osm = osm_geojson.geojson2osm(json);
 							res.set('Content-Type', 'text/xml');
 							res.send(osm);
@@ -219,17 +219,61 @@ function rename_road(road_name) {
 
 	};
 
-	var words = road_name.split(" ");
-	if (words.length < 2) return road_name;
-	var word = words[words.length - 1].toLowerCase();
-	var newname = "";
-	for (var w = 0; w < words.length - 1; w++) {
-		newname += words[w];
-		newname += " ";
-	}
-	if (road_types[word] === undefined) return road_name;
+	var direction = {
+		//Directions
+		"n": "North",
+		"s": "South",
+		"e": "East",
+		"w": "West",
+		"ne": "Northeast",
+		"nw": "Northwest",
+		"se": "Southeast",
+		"sw": "Southwest"
 
-	newname += road_types[word];
+	};
+
+
+	var words = road_name.split(" ");
+
+	if (words.length < 2) return road_name;
+
+	var word_end = words[words.length - 1].toLowerCase();
+	var newname = "";
+	var word_start = words[0].toLowerCase();
+
+	for (var w = 0; w < words.length - 1; w++) {
+
+		if (w === 0 && word_start.length < 3 && direction[word_start] !== undefined) {
+			newname += direction[word_start];
+			newname += " ";
+		} else {
+			newname += words[w];
+			newname += " ";
+		}
+	}
+
+	//if the last word is number like: NW 0141
+	if (!isNaN(word_end) && direction[word_start] !== undefined) {
+		newname += word_end;
+		console.log('# ' + road_name + ' --> ' + newname);
+		return newname;
+	}
+	//for name as :  SW Dickens Rd ,NE Pr 1030 B 
+	if (direction[word_start] !== undefined) {
+		newname += word_end;
+		console.log('# ' + road_name + ' --> ' + newname);
+		return newname;
+	}
+
+
+
+	if (road_types[word_end] === undefined) {
+		console.log('# ' + road_name + ' --> ' + road_name);
+		return road_name;
+	}
+
+	newname += road_types[word_end];
 	console.log('# ' + road_name + ' --> ' + newname);
 	return newname;
+
 }
