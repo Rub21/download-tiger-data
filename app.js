@@ -2,6 +2,7 @@
     var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617')
         .setView([38.89399, -77.03659], 4);
     var host = '54.234.212.165';
+
     var hash = L.hash(map);
     var featureGroup = L.featureGroup().addTo(map);
     var drawControl = new L.Control.Draw({
@@ -24,11 +25,9 @@
     map.on('draw:created', function(e) {
         var layer = e.layer;
         featureGroup.addLayer(layer);
-        layer.on('contextmenu', function(evt) {
-            context_menu(evt, e);
-            // download_josm_xml(get_valor(type, layer)); //working with xml
-            // download_file_json(get_valor(type, layer)); //working with json
-        });
+        var coords = get_valor(e.layerType, e.layer);
+        var btn = '<button class = "btn btn-default btn-lg" onclick="download_josm_xml(\'' + coords.toString() + '\')">Download Data</button>';
+        layer.bindPopup(btn);
     });
 
     function get_valor(type, layer) {
@@ -69,18 +68,4 @@
                 pom.click();
             }
         });
-    }
-
-    function context_menu(evt, e) {
-        $('#context').show();
-        $('#context').css('left', evt.originalEvent.clientX);
-        $('#context').css('top', evt.originalEvent.clientY);
-        $('#context').hover(function() {
-            $('#context').show();
-        });
-        $('#context').mouseleave(function() {
-            $('#context').hide();
-        });
-        var coords = get_valor(e.layerType, e.layer);
-        $("#btndownload").attr('onclick', 'download_josm_xml(\'' + coords + '\')');
     }

@@ -29,7 +29,7 @@ app.get('/ways_json/:bbox', function(req, res) {
 		} else {
 			try {
 				var geoid = result.rows[0].geoid;
-				console.log(geoid);
+				console.log('='+geoid);
 				bbox = bbox.replace(' ', ',').replace(' ', ',');
 				var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
 				client.query(query, function(error, result) {
@@ -90,8 +90,9 @@ app.get('/ways_xml/:bbox', function(req, res) {
 				var geoid = result.rows[0].geoid;
 				console.log(geoid);
 				bbox = bbox.replace(' ', ',').replace(' ', ',');
+				//var query = "SELECT  fullname, ST_AsGeoJSON(ST_Simplify(geom,0.00001)) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
 				var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
-					//console.log(query);
+				console.log(query);
 				client.query(query, function(error, result) {
 					if (error) {
 						console.log(error);
