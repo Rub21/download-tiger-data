@@ -192,6 +192,7 @@ function rename_road(road_name) {
 		"unp": "Underpass",
 		"wkwy": "Walkway",
 		"xing": "Crossing",
+		"Pt" : "Point",
 		//NOT EXPANDED
 		"way": "Way",
 		"walk": "Walk",
@@ -260,12 +261,10 @@ function rename_road(road_name) {
 	}
 	//for name as :  SW Dickens Rd ,NE Pr 1030 B 
 	if (direction[word_start] !== undefined) {
-		newname += word_end;
+		newname += road_types[word_end];
 		console.log('# ' + road_name + ' --> ' + newname);
 		return newname;
 	}
-
-
 
 	if (road_types[word_end] === undefined) {
 		console.log('# ' + road_name + ' --> ' + road_name);
