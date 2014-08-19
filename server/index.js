@@ -192,7 +192,8 @@ function rename_road(road_name) {
 		"unp": "Underpass",
 		"wkwy": "Walkway",
 		"xing": "Crossing",
-		"Pt" : "Point",
+		"pt": "Point",
+		"hts": "Heights",
 		//NOT EXPANDED
 		"way": "Way",
 		"walk": "Walk",
