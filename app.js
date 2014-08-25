@@ -24,10 +24,22 @@
 
     map.on('draw:created', function(e) {
         var layer = e.layer;
+        console.log(layer);
         featureGroup.addLayer(layer);
         var coords = get_valor(e.layerType, e.layer);
         var btn = '<button class = "btn btn-default btn-lg" onclick="download_josm_xml(\'' + coords.toString() + '\')">Download Data</button>';
         layer.bindPopup(btn);
+        layer.openPopup();
+        var coor1 = coords.split(',')[0].split(' ');
+        var coor2 = coords.split(',')[1].split(' ');
+        var lng = (parseFloat(coor1[0]) + parseFloat(coor2[0])) / 2;
+        var lat = (parseFloat(coor1[1]) + parseFloat(coor2[1])) / 2;
+        var popup = L.popup()
+            .setLatLng([lat, lng])
+            .setContent(btn)
+            .openOn(map);
+
+
     });
 
     function get_valor(type, layer) {
