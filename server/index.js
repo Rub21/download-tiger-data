@@ -3,7 +3,7 @@ var cors = require('cors');
 var pg = require('pg');
 var osm_geojson = require('../osm2geojson.js');
 
-var conString = "postgres://postgres:1234@192.168.1.20/dbtiger";
+var conString = "postgres://postgres:1234@54.234.212.165/dbtiger";
 var client = new pg.Client(conString);
 var app = express();
 app.use(cors());
@@ -90,8 +90,8 @@ app.get('/ways_xml/:bbox', function(req, res) {
 				var geoid = result.rows[0].geoid;
 				console.log(geoid);
 				bbox = bbox.replace(' ', ',').replace(' ', ',');
-				var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
-				//var query = "select fullname, ST_AsGeoJSON(geom) as geometry from pool_test";
+				//var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
+				var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
 				console.log(query);
 				client.query(query, function(error, result) {
 					if (error) {
