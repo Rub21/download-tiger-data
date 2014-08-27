@@ -1,10 +1,11 @@
     L.mapbox.accessToken = 'pk.eyJ1IjoicnViZW4iLCJhIjoiUVFINFozRSJ9.lIZKS5xpyV57U6-_Rjr6Og';
-    var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617')
+    var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617,ruben.sstnjyvi')
         .setView([38.89399, -77.03659], 4);
-    var host = '54.234.212.165';
+    var host = 'localhost';
 
     var hash = L.hash(map);
     var featureGroup = L.featureGroup().addTo(map);
+
     var drawControl = new L.Control.Draw({
         draw: {
             polyline: false,
@@ -21,6 +22,9 @@
             featureGroup: featureGroup
         }
     }).addTo(map);
+
+
+
 
     map.on('draw:created', function(e) {
         var layer = e.layer;
