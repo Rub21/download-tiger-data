@@ -1,6 +1,7 @@
 var express = require('express');
 var cors = require('cors');
 var pg = require('pg');
+var geojsonArea = require('geojson-area');
 var osm_geojson = require('../osm2geojson.js');
 
 var conString = "postgres://postgres:1234@54.234.212.165/dbtiger";
@@ -21,6 +22,7 @@ app.get('/ways_json/:bbox', function(req, res) {
 		"features": []
 	};
 	var query_id = "select get_geoid('" + bbox + "') as geoid;";
+
 	client.query(query_id, function(error, result) {
 		if (error) {
 			console.log(error);
@@ -78,63 +80,89 @@ app.get('/ways_xml/:bbox', function(req, res) {
 		"type": "FeatureCollection",
 		"features": []
 	};
-	var query_id = "select get_geoid('" + bbox + "') as geoid;";
+	//AREA
+	var coor1 = bbox.split(',')[0].split(' ');
+	var coor2 = bbox.split(',')[1].split(' ');
+	var min_lng = parseFloat(coor1[0]);
+	var max_lng = parseFloat(coor2[0]);
+	var min_lat = parseFloat(coor1[1]);
+	var max_lat = parseFloat(coor2[1]);
+	var obj_area = {
+		"type": "Polygon",
+		"coordinates": [
+			[
+				[min_lng, min_lat],
+				[min_lng, max_lat],
+				[max_lng, max_lat],
+				[max_lng, min_lat],
+				[min_lng, min_lat]
+			]
+		]
+	};
+	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2
+	if (area > 20) {
+		res.send("select areas smaller than 20 square miles");
+	} else {
+		var query_id = "select get_geoid2('" + bbox + "') as geoid;";
+		console.log(query_id);
+		client.query(query_id, function(error, result) {
+			if (error) {
+				console.log(error);
+				res.statusCode = 404;
+				return res.send('Error 404: No quote found');
+			} else {
+				try {
+					var geoid = result.rows[0].geoid;
+					console.log(geoid);
+					bbox = bbox.replace(' ', ',').replace(' ', ',');
+					//var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
+					var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
+					console.log(query);
+					client.query(query, function(error, result) {
+						if (error) {
+							console.log(error);
+							res.statusCode = 404;
+							return res.send('Error 404: No quote found');
+						} else {
+							try {
+								for (var i = 0; i < result.rows.length; i++) {
+									var way = {
+										"type": "Feature",
+										"properties": {
+											"highway": "residential"
+										},
+										"geometry": {}
+									}
+									if (result.rows[i].fullname !== null) {
+										way.properties['name'] = rename_road(result.rows[i].fullname);
 
-	client.query(query_id, function(error, result) {
-		if (error) {
-			console.log(error);
-			res.statusCode = 404;
-			return res.send('Error 404: No quote found');
-		} else {
-			try {
-				var geoid = result.rows[0].geoid;
-				console.log(geoid);
-				bbox = bbox.replace(' ', ',').replace(' ', ',');
-				//var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
-				var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
-				console.log(query);
-				client.query(query, function(error, result) {
-					if (error) {
-						console.log(error);
-						res.statusCode = 404;
-						return res.send('Error 404: No quote found');
-					} else {
-						try {
-							for (var i = 0; i < result.rows.length; i++) {
-								var way = {
-									"type": "Feature",
-									"properties": {
-										"highway": "residential"
-									},
-									"geometry": {}
-								}
-								if (result.rows[i].fullname !== null) {
-									way.properties['name'] = rename_road(result.rows[i].fullname);
+									}
+									way.geometry = JSON.parse(result.rows[i].geometry);
+									json.features.push(way);
 
-								}
-								way.geometry = JSON.parse(result.rows[i].geometry);
-								json.features.push(way);
+								};
 
-							};
-
-							var osm = osm_geojson.geojson2osm(json);
-							res.set('Content-Type', 'text/xml');
-							res.send(osm);
+								var osm = osm_geojson.geojson2osm(json);
+								res.set('Content-Type', 'text/xml');
+								res.send(osm);
 
 
 
-						} catch (e) {
-							console.log("entering catch block2");
+							} catch (e) {
+								console.log("entering catch block2");
+							}
 						}
-					}
-				});
-			} catch (e) {
-				console.log(e);
-				console.log("entering catch block1");
+					});
+				} catch (e) {
+					console.log(e);
+					console.log("entering catch block1");
 
+				}
 			}
-		}
-	});
+		});
+	}
+
+
 });
 
 
