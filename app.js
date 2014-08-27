@@ -25,7 +25,6 @@
 
     map.on('draw:created', function(e) {
         var layer = e.layer;
-        console.log(polygonArea(layer.getLatLngs()));
         if (polygonArea(layer.getLatLngs()) > 20) {
             alert("Select areas smaller than 20 square miles");
         } else {
@@ -55,14 +54,16 @@
             return valor;
         }
     }
+
     function download_josm_xml(coordinates) {
         var url = 'http://' + host + ':3021/ways_xml/' + coordinates;
-        console.log(url);
+        //console.log(url);
         var p1 = coordinates.split(",")[0].split(" ");
         var p2 = coordinates.split(",")[1].split(" ");
         $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
         $.ajax('http://localhost:8111/import?title=tiger2013&new_layer=true&url=' + url);
     }
+
     function download_file_json(coordinates) {
         var url = 'http://' + host + ':3021/ways_json/' + coordinates;
         //console.log(url);
@@ -82,7 +83,7 @@
             }
         });
     }
-    
+
     function polygonArea(coords) {
         numPoints = coords.length;
         X = [];
@@ -97,7 +98,6 @@
             area = area + (X[j] + X[i]) * (Y[j] - Y[i]);
             j = i;
         }
-
         area = (Math.abs(area) / 2) * 10000;
         return area;
     }
