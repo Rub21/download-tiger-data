@@ -100,11 +100,13 @@ app.get('/ways_xml/:bbox', function(req, res) {
 		]
 	};
 	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2
+	console.log(area);
 	if (area > 20) {
-		res.send("select areas smaller than 20 square miles");
+
+		res.send("Select areas smaller than 20 square miles");
 	} else {
-		var query_id = "select get_geoid2('" + bbox + "') as geoid;";
-		console.log(query_id);
+		var query_id = "select get_geoid('" + bbox + "') as geoid;";
+		//console.log(query_id);
 		client.query(query_id, function(error, result) {
 			if (error) {
 				console.log(error);
@@ -161,10 +163,7 @@ app.get('/ways_xml/:bbox', function(req, res) {
 			}
 		});
 	}
-
-
 });
-
 
 app.listen(process.env.PORT || 3021);
 
