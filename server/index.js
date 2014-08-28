@@ -114,8 +114,8 @@ app.get('/ways_xml/:bbox', function(req, res) {
 					var geoid = result.rows[0].geoid;
 					console.log(geoid);
 					bbox = bbox.replace(' ', ',').replace(' ', ',');
-					//var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
-					var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
+					var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
+					//var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
 					console.log(query);
 					client.query(query, function(error, result) {
 						if (error) {
