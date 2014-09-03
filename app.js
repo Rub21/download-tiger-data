@@ -1,5 +1,5 @@
     L.mapbox.accessToken = 'pk.eyJ1IjoicnViZW4iLCJhIjoiUVFINFozRSJ9.lIZKS5xpyV57U6-_Rjr6Og';
-    var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617,ruben.sstnjyvi')
+    var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617,ruben.rqr7wrk9')
         .setView([38.89399, -77.03659], 4);
     var host = '54.234.212.165';
 
