@@ -4,7 +4,7 @@ var pg = require('pg');
 var geojsonArea = require('geojson-area');
 var osm_geojson = require('../osm2geojson.js');
 
-var conString = "postgres://postgres:1234@54.234.212.165/dbtiger";
+var conString = "postgres://postgres:1234@54.90.53.69/dbtiger";
 var client = new pg.Client(conString);
 var app = express();
 app.use(cors());
