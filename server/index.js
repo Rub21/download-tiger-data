@@ -100,7 +100,7 @@ app.get('/ways_xml/:bbox', function(req, res) {
 		]
 	};
 	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2
-	if (area > 20) {
+	if (area > 100) {
 		res.send("Select areas smaller than 20 square miles");
 	} else {
 		var query_id = "select get_geoid('" + bbox + "') as geoid;";
