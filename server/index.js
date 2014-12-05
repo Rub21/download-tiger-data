@@ -4,7 +4,7 @@ var pg = require('pg');
 var geojsonArea = require('geojson-area');
 var osm_geojson = require('../osm2geojson.js');
 
-var conString = "postgres://postgres:1234@54.90.53.69/dbtiger";
+var conString = "postgres://postgres:1234@54.146.129.194/dbtiger";
 var client = new pg.Client(conString);
 var app = express();
 app.use(cors());
@@ -99,8 +99,8 @@ app.get('/ways_xml/:bbox', function(req, res) {
 			]
 		]
 	};
-	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2
-	if (area > 100) {
+	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2 20 mill = 32.18688KM
+	if (area > 32.18688) {
 		res.send("Select areas smaller than 20 square miles");
 	} else {
 		var query_id = "select get_geoid('" + bbox + "') as geoid;";
