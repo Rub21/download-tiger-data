@@ -100,7 +100,7 @@ app.get('/ways_xml/:bbox', function(req, res) {
 		]
 	};
 	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2 20 mill = 32.18688KM
-	if (area > 32.18688) {
+	if (area > 1000) {
 		res.send("Select areas smaller than 20 square miles");
 	} else {
 		var query_id = "select get_geoid('" + bbox + "') as geoid;";
@@ -115,7 +115,7 @@ app.get('/ways_xml/:bbox', function(req, res) {
 					console.log(geoid);
 					bbox = bbox.replace(' ', ',').replace(' ', ',');
 					var query = "SELECT  fullname, ST_AsGeoJSON(geom) as geometry FROM tl_2013_" + geoid + "_roads WHERE   st_within(tl_2013_" + geoid + "_roads.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
-					//var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
+						//var query = "select fullname, ST_AsGeoJSON(geom) as geometry  FROM  get_data('" + bbox + "','" + geoid + "')";
 					console.log(query);
 					client.query(query, function(error, result) {
 						if (error) {
@@ -159,6 +159,109 @@ app.get('/ways_xml/:bbox', function(req, res) {
 				}
 			}
 		});
+	}
+});
+
+
+/*********************************FOREST ROADS***********************************
+ *********************************************************************************/
+
+app.get('/ways_xml_forest/:bbox', function(req, res) {
+	var bbox = req.params.bbox;
+	var json = {
+		"type": "FeatureCollection",
+		"features": []
+	};
+	//AREA
+	var coor1 = bbox.split(',')[0].split(' ');
+	var coor2 = bbox.split(',')[1].split(' ');
+	var min_lng = parseFloat(coor1[0]);
+	var max_lng = parseFloat(coor2[0]);
+	var min_lat = parseFloat(coor1[1]);
+	var max_lat = parseFloat(coor2[1]);
+	var obj_area = {
+		"type": "Polygon",
+		"coordinates": [
+			[
+				[min_lng, min_lat],
+				[min_lng, max_lat],
+				[max_lng, max_lat],
+				[max_lng, min_lat],
+				[min_lng, min_lat]
+			]
+		]
+	};
+	var area = geojsonArea.geometry(obj_area) / 1000000; //in KM2 20 mill = 32.18688KM
+	if (area > 1000) {
+		res.send("Select areas smaller than 20 square miles");
+	} else {
+
+		try {
+
+			bbox = bbox.replace(' ', ',').replace(' ', ',');
+			//var query = "SELECT  name as fullname, symbol_cod, ST_AsGeoJSON(geom) as geometry FROM forest_road WHERE   st_within(forest_road.geom ,ST_MakeEnvelope(" + bbox + ", 4326))"
+			var query = "SELECT name as fullname, symbol_cod, symbol_nam, ST_AsGeoJSON(geom) as geometry FROM forest_road WHERE   st_within(forest_road.geom ,ST_MakeEnvelope(" + bbox + ", 4326))";
+			console.log(query);
+			client.query(query, function(error, result) {
+				if (error) {
+					console.log(error);
+					res.statusCode = 404;
+					return res.send('Error 404: No quote found');
+				} else {
+					try {
+						for (var i = 0; i < result.rows.length; i++) {
+
+							var way = {
+								"type": "Feature",
+								"properties": {
+									"highway": "residential",
+									'symbol_cod': result.rows[i].symbol_cod,
+									'symbol_nam': result.rows[i].symbol_nam
+								},
+								"geometry": {}
+							}
+
+							switch (parseInt(result.rows[i].symbol_cod)) {
+								case 106:
+									way.properties['highway'] = 'track';
+									break;
+								case 517:
+									way.properties['highway'] = 'unclassified';
+									way.properties['surface'] = 'paved';
+									break;
+								case 518:
+									way.properties['highway'] = 'unclassified';
+									break;
+								default:
+									way.properties['highway'] = 'track';
+									break;
+							}
+
+							if (result.rows[i].fullname !== null) {
+								way.properties['name'] = rename_road(result.rows[i].fullname);
+
+							}
+							way.geometry = JSON.parse(result.rows[i].geometry);
+							json.features.push(way);
+
+						};
+
+						var osm = osm_geojson.geojson2osm(json);
+						res.set('Content-Type', 'text/xml');
+						res.send(osm);
+
+
+
+					} catch (e) {
+						console.log("entering catch block2");
+					}
+				}
+			});
+		} catch (e) {
+			console.log(e);
+			console.log("entering catch block1");
+
+		}
 	}
 });
 

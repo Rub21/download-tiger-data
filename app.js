@@ -1,7 +1,35 @@
     L.mapbox.accessToken = 'pk.eyJ1IjoicnViZW4iLCJhIjoiUVFINFozRSJ9.lIZKS5xpyV57U6-_Rjr6Og';
-    var map = L.mapbox.map('map', 'ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617,ruben.rqr7wrk9')
-        .setView([38.89399, -77.03659], 4);
-    var host = '54.146.129.194';
+
+    /**********************/
+    var l_tiger = L.mapbox.tileLayer('ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617,ruben.rqr7wrk9', {
+            id: 'tig'
+        }),
+        l_forest = L.tileLayer('http://osm.cycle.travel/forest/{z}/{x}/{y}.png', {
+            id: 'for',
+            attribution: '<div class="atr_l" id="forest"></div>'
+        }),
+        l_osm = L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            id: 'osm',
+            attribution: '<div class="atr_l" id="osm"></div>'
+        });
+
+    //var layerGroup = L.layerGroup([l_tiger, l_forest, l_osm]);
+
+    var layers = {
+        'Tiger': l_tiger,
+        'The US Forest Service data': l_forest,
+        'OSM.org': l_osm
+    };
+
+    var map = L.mapbox.map('map', null, {
+        center: new L.LatLng(38.8929, -100.0252),
+        zoom: 4 //,
+            //layers: layerGroup
+    });
+
+    layers['Tiger'].addTo(map);
+    L.control.layers(layers).addTo(map);
+    var host = 'localhost';
 
     var hash = L.hash(map);
     var featureGroup = L.featureGroup().addTo(map);
@@ -25,12 +53,19 @@
 
     map.on('draw:created', function(e) {
         var layer = e.layer;
-        if (polygonArea(layer.getLatLngs()) > 32.18688) {
+        if (polygonArea(layer.getLatLngs()) > 1000) {
             alert("Select areas smaller than 20 square miles");
         } else {
+            console.log($('.atr_l').attr('id'));
             featureGroup.addLayer(layer);
             var coords = get_valor(e.layerType, e.layer);
-            var btn = '<button class = "btn btn-default btn-lg" onclick="download_josm_xml(\'' + coords.toString() + '\')">Download Data</button>';
+            //if (typeof $('.atr_l').attr('id') === 'undefined') {
+            //     var btn = '<button class = "btn btn-default btn-lg" onclick="download_josm_xml(\'' + coords.toString() + '\')">Download Data</button>';
+            // } else if ($('.atr_l').attr('id') === 'forest') {
+            //     var btn = '<button class = "btn btn-default btn-lg" onclick="download_josm_xml_forest(\'' + coords.toString() + '\')">Download Data</button>';
+            //  }
+
+            var btn = '<button class = "btn btn-default btn-lg" onclick="check_layer(\'' + coords.toString() + '\')">Download Data</button>';
             layer.bindPopup(btn);
             layer.openPopup();
             var coor1 = coords.split(',')[0].split(' ');
@@ -57,7 +92,16 @@
 
     function download_josm_xml(coordinates) {
         var url = 'http://' + host + ':3021/ways_xml/' + coordinates;
-        //console.log(url);
+        console.log(url);
+        var p1 = coordinates.split(",")[0].split(" ");
+        var p2 = coordinates.split(",")[1].split(" ");
+        $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
+        $.ajax('http://localhost:8111/import?title=tiger2013&new_layer=true&url=' + url);
+    }
+
+    function download_josm_xml_forest(coordinates) {
+        var url = 'http://' + host + ':3021/ways_xml_forest/' + coordinates;
+        console.log(url);
         var p1 = coordinates.split(",")[0].split(" ");
         var p2 = coordinates.split(",")[1].split(" ");
         $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
@@ -66,7 +110,7 @@
 
     function download_file_json(coordinates) {
         var url = 'http://' + host + ':3021/ways_json/' + coordinates;
-        //console.log(url);
+        console.log(url);
         var p1 = coordinates.split(",")[0].split(" ");
         var p2 = coordinates.split(",")[1].split(" ");
         $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
@@ -101,3 +145,11 @@
         area = (Math.abs(area) / 2) * 10000;
         return area;
     }
+
+    function check_layer(coordinates) {
+        if (typeof $('.atr_l').attr('id') === 'undefined') {
+            download_josm_xml(coordinates);
+        } else if ($('.atr_l').attr('id') === 'forest') {
+            download_josm_xml_forest(coordinates);
+        }
+    };
