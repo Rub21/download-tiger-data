@@ -214,9 +214,9 @@ app.get('/ways_xml_forest/:bbox', function(req, res) {
 							var way = {
 								"type": "Feature",
 								"properties": {
-									"highway": "residential",
-									'symbol_cod': result.rows[i].symbol_cod,
-									'symbol_nam': result.rows[i].symbol_nam
+									"highway": "residential"
+									//'symbol_cod': result.rows[i].symbol_cod,
+									//'symbol_nam': result.rows[i].symbol_nam
 								},
 								"geometry": {}
 							}
