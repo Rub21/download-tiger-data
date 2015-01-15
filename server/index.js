@@ -238,7 +238,8 @@ app.get('/ways_xml_forest/:bbox', function(req, res) {
 							}
 
 							if (result.rows[i].fullname !== null) {
-								way.properties['name'] = rename_road(result.rows[i].fullname);
+								way.properties['name'] = rename_road(result.rows[i].fullname.toLowerCase().capitalize());
+								//console.log(way.properties['name']);
 
 							}
 							way.geometry = JSON.parse(result.rows[i].geometry);
@@ -522,3 +523,7 @@ function rename_road(road_name) {
 	return newname;
 
 }
+
+String.prototype.capitalize = function() {
+  return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); });
+};
