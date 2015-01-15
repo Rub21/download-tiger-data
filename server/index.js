@@ -4,7 +4,7 @@ var pg = require('pg');
 var geojsonArea = require('geojson-area');
 var osm_geojson = require('../osm2geojson.js');
 
-var conString = "postgres://postgres:1234@54.146.129.194/dbtiger";
+var conString = "postgres://postgres:1234@localhost/dbtiger";
 var client = new pg.Client(conString);
 var app = express();
 app.use(cors());
@@ -210,13 +210,12 @@ app.get('/ways_xml_forest/:bbox', function(req, res) {
 				} else {
 					try {
 						for (var i = 0; i < result.rows.length; i++) {
-
 							var way = {
 								"type": "Feature",
 								"properties": {
 									"highway": "residential"
-									//'symbol_cod': result.rows[i].symbol_cod,
-									//'symbol_nam': result.rows[i].symbol_nam
+										//'symbol_cod': result.rows[i].symbol_cod,
+										//'symbol_nam': result.rows[i].symbol_nam
 								},
 								"geometry": {}
 							}
@@ -525,5 +524,7 @@ function rename_road(road_name) {
 }
 
 String.prototype.capitalize = function() {
-  return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); });
+	return this.replace(/(^|\s)([a-z])/g, function(m, p1, p2) {
+		return p1 + p2.toUpperCase();
+	});
 };

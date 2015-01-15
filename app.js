@@ -1,6 +1,4 @@
     L.mapbox.accessToken = 'pk.eyJ1IjoicnViZW4iLCJhIjoiUVFINFozRSJ9.lIZKS5xpyV57U6-_Rjr6Og';
-
-    /**********************/
     var l_tiger = L.mapbox.tileLayer('ruben.j0ac34if,enf.y5c4ygb9,enf.ho20a3n1,enf.game1617,ruben.rqr7wrk9', {
             id: 'tig'
         }),
@@ -12,28 +10,22 @@
             id: 'osm',
             attribution: '<div class="atr_l" id="osm"></div>'
         });
-
     //var layerGroup = L.layerGroup([l_tiger, l_forest, l_osm]);
-
     var layers = {
         'Tiger': l_tiger,
         'The US Forest Service data': l_forest,
         'OSM.org': l_osm
     };
-
     var map = L.mapbox.map('map', null, {
         center: new L.LatLng(38.8929, -100.0252),
-        zoom: 4 //,
-            //layers: layerGroup
+        zoom: 4
     });
-
     layers['Tiger'].addTo(map);
     L.control.layers(layers).addTo(map);
-    var host = 'localhost';
-
+    //var host = 'localhost';
+    var host = '54.146.129.194';
     var hash = L.hash(map);
     var featureGroup = L.featureGroup().addTo(map);
-
     var drawControl = new L.Control.Draw({
         draw: {
             polyline: false,
@@ -64,7 +56,6 @@
             // } else if ($('.atr_l').attr('id') === 'forest') {
             //     var btn = '<button class = "btn btn-default btn-lg" onclick="download_josm_xml_forest(\'' + coords.toString() + '\')">Download Data</button>';
             //  }
-
             var btn = '<button class = "btn btn-default btn-lg" onclick="check_layer(\'' + coords.toString() + '\')">Download Data</button>';
             layer.bindPopup(btn);
             layer.openPopup();
