@@ -45,7 +45,7 @@
 
     map.on('draw:created', function(e) {
         var layer = e.layer;
-        if (polygonArea(layer.getLatLngs()) > 1000) {
+        if (polygonArea(layer.getLatLngs()) > 20) {
             alert("Select areas smaller than 20 square miles");
         } else {
             console.log($('.atr_l').attr('id'));
