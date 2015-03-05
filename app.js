@@ -23,7 +23,7 @@
     layers['Tiger'].addTo(map);
     L.control.layers(layers).addTo(map);
     //var host = 'localhost';
-    var host = '54.146.129.194';
+    var host = '54.147.228.251';
     var hash = L.hash(map);
     var featureGroup = L.featureGroup().addTo(map);
     var drawControl = new L.Control.Draw({
