@@ -86,6 +86,7 @@
         console.log(url);
         var p1 = coordinates.split(",")[0].split(" ");
         var p2 = coordinates.split(",")[1].split(" ");
+        console.log('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
         $.ajax('http://localhost:8111/load_and_zoom?left=' + p1[0] + '&right=' + p2[0] + '&top=' + p2[1] + '&bottom=' + p1[1]);
         $.ajax('http://localhost:8111/import?title=tiger2013&new_layer=true&url=' + url);
     }
